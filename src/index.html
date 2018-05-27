@@ -1,0 +1,75 @@
+<!Doctype html>
+<html>
+<head>
+	<title>Project Sheets</title>
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+</head>
+<body>
+	<h2>Charbel Announcements</h2><br>
+	<a href="#" onclick="getData()">Refresh</a>
+	<br>
+	<ul id="list">
+		
+	</ul>
+</body>
+</html>
+<script type="text/javascript">
+$(document).ready(()=>{
+	console.log('script executed');
+	getData();
+});	
+
+var getData = ()=>{
+
+	$.ajax({
+		type:'GET',
+		url:'https://sheets.googleapis.com/v4/spreadsheets/17e2QlF7XTDuAFgnROkef-UrNs28XAhT8_XNqOTGgcFQ/values/Announcement',
+		data: {
+			key: 'AIzaSyBVtB5ME7FX7-tdxc1wjIh8-yn49eC2K0s'
+		},
+		cache:'false',
+		success: result=>{
+			//console.log(result);
+			localStorage.setItem("projsheets-data",JSON.stringify(result));
+			displayData();
+		}
+	}).fail(()=>{
+		console.log("An Error Occurred");
+	});
+}
+
+var displayData = ()=>{
+	try {
+		var rawData = JSON.parse(localStorage.getItem("projsheets-data"));
+		var data = rawData.values;
+
+		var header = data[0];
+		data.splice(0,1);
+
+		var values = data.reverse();
+		console.warn(values);
+
+		$("#list").html("");
+
+		$.each(values,(index,val)=>{
+			var ts = val[0];
+			var title = val[1];
+			var content = val[2];
+
+			var tpl = `
+			<li>
+				<h4>${title}</h4><br>
+				<font size="-1">${ts}</font><br>
+				<br>
+				<p>${content}</p>
+			</li>
+			`;
+
+			$("#list").append(tpl);
+		});
+
+	} catch(e){
+		console.log(e);
+	}
+}
+</script>
